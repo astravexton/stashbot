@@ -6,6 +6,7 @@ namespace StashBot.Models.ArgumentModels
     public class CommandHandlerArguments
     {
         public string Command { get; set; }
+        public string CommandArgument { get; set; }
         public string[] CommandArguments { get; set; }
 
         public TelegramUser TelegramUser { get; set; }

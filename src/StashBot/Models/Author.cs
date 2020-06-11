@@ -14,6 +14,7 @@ namespace StashBot.Models
         public long TelegramId { get; set; }
         public string TelegramName { get; set; }
         public string TelegramUsername { get; set; }
+        public string TelegramUsernameUpper { get; set; }
 
         public bool CanDeleteOthers { get; set; } = false;
         public bool CanFlushQueue { get; set; } = false;

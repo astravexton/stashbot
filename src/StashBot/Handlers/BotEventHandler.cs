@@ -24,7 +24,7 @@ namespace StashBot.Handlers
                     {
                         string messageText = telegramMessageEvent.Message.Text.ToString();
 
-                        Regex commandAndArgumentsRegex = new Regex(@"^([\/][a-z]{1,100})([ ])*([\/a-zA-Z0-9_:.,-@ ]*)$");
+                        Regex commandAndArgumentsRegex = new Regex(@"^([\/][a-z]{1,100})([ ])*([\/a-zA-Z0-9_:.,*-@ ]*)$");
                         Match parsedCommand = commandAndArgumentsRegex.Match(messageText);
 
                         arguments.TelegramUser = TelegramUtilities.GetTelegramUser(telegramMessageEvent);
@@ -32,6 +32,7 @@ namespace StashBot.Handlers
                         if (messageText.StartsWith("/"))
                         {
                             arguments.Command = parsedCommand.Groups[1].Value.Replace("/", "").ToLower();
+                            arguments.CommandArgument = parsedCommand.Groups[3].Value;
                             arguments.CommandArguments = parsedCommand.Groups[3].Value.Split(" ");
                             arguments.TelegramMessageEvent = telegramMessageEvent;
 

@@ -24,7 +24,7 @@ namespace StashBot.Services.ScrapeServices
                 string username = String.Empty;
 
                 List<string> media = new List<string>();
-                QueueItem.MediaType mediaType = QueueItem.MediaType.Image;
+                List<QueueItem.MediaType> types = new List<QueueItem.MediaType>();
 
                 foreach (var item in galleryDlOutput.Children())
                 {
@@ -48,11 +48,11 @@ namespace StashBot.Services.ScrapeServices
                         case 3:
                             if (item[2]["typename"].ToString() == "GraphVideo")
                             {
-                                mediaType = QueueItem.MediaType.Video;
+                                types.Add(QueueItem.MediaType.Video);
                             }
                             else if (item[2]["typename"].ToString() == "GraphImage")
                             {
-                                mediaType = QueueItem.MediaType.Image;
+                                types.Add(QueueItem.MediaType.Image);
                             }
                             media.Add(item[1].ToString());
                             hasMedia = true;
@@ -75,7 +75,9 @@ namespace StashBot.Services.ScrapeServices
                         Name = name,
                         SourceName = service,
                         SourceUrl = source,
-                        Type = mediaType,
+                        Type = (mediaIndex + 1 > types.Count || mediaIndex < 0) ?
+                            types[0] :
+                            types[mediaIndex],
                         UsernameUrl = username
                     };
                 }

@@ -191,6 +191,8 @@ namespace StashBot.Data
 
         public static Author GetAuthorByTelegramUsername(string telegramUsername, bool addAt = true)
         {
+            telegramUsername = telegramUsername.ToUpper();
+
             using (var db = new StashBotDbContext())
             {
                 if (addAt)
@@ -199,7 +201,7 @@ namespace StashBot.Data
                 }
 
                 Author author = db.Authors
-                        .FirstOrDefault(a => a.TelegramUsername == telegramUsername);
+                        .FirstOrDefault(a => a.TelegramUsernameUpper == telegramUsername);
                 return author;
             }
         }
@@ -225,11 +227,13 @@ namespace StashBot.Data
                 {
                     if (!(
                         author.TelegramName == user.Name &&
-                        author.TelegramUsername == user.Username
+                        author.TelegramUsername == user.Username &&
+                        author.TelegramUsernameUpper == user.Username.ToUpper()
                     ))
                     {
                         author.TelegramName = user.Name;
                         author.TelegramUsername = user.Username;
+                        author.TelegramUsernameUpper = user.Username.ToUpper();
                         author.TelegramDetailsLastUpdatedAt = DateTime.UtcNow;
 
                         db.SaveChanges();

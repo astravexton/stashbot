@@ -50,13 +50,13 @@ namespace StashBot.Handlers.CommandHandlers
                     }
 
                     TelegramApiService.SendTextMessage(
-                    new SendTextMessageArguments
-                    {
-                        Text = helpText
-                    },
-                    Program.BotClient,
-                    arguments.TelegramMessageEvent
-                );
+                        new SendTextMessageArguments
+                        {
+                            Text = helpText
+                        },
+                        Program.BotClient,
+                        arguments.TelegramMessageEvent
+                    );
                 }
                 else
                 {
