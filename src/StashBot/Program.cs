@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
@@ -98,7 +99,8 @@ namespace StashBot
 
             AppSettings.ApiKeys_Telegram = configuration.GetSection("apiKeys")["telegram"];
             AppSettings.Config_ChannelId = Convert.ToInt64(configuration.GetSection("config")["channel"]);
-            AppSettings.Config_Owner = configuration.GetSection("config")["owner"];
+            AppSettings.Config_Name = (configuration.GetSection("config").GetChildren().Any(i => i.Key == "name")) ? configuration.GetSection("config")["name"] : "StashBot";
+            AppSettings.Config_Owner = "@" + configuration.GetSection("config")["owner"].Replace("@", "");
             AppSettings.Config_Poll = Convert.ToBoolean(configuration.GetSection("config")["poll"]);
             AppSettings.Config_PostInterval = Convert.ToInt32(configuration.GetSection("config")["postInterval"]);
         }
@@ -111,13 +113,13 @@ namespace StashBot
     },
     ""config"": {
         ""channel"": -1000000000000,
+        ""name"": ""StashBot"",
         ""owner"": ""ownerUsername"",
         ""poll"": true,
         ""postInterval"": 30000
     }
 }";
 
-            File.Create("appsettings.json");
             File.WriteAllText("appsettings.json", defaultConfig);
         }
     }

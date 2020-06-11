@@ -25,6 +25,8 @@ namespace StashBot.Handlers.CommandHandlers
                 Program.BotClient,
                 arguments.TelegramMessageEvent
             );
+
+            Constants.Cats++;
         }
     }
 }

@@ -10,7 +10,8 @@ namespace StashBot.Handlers.CommandHandlers
 {
     public class InfoCommandHandler
     {
-        public static Help Help = new Help {
+        public static Help Help = new Help
+        {
             Command = "info",
             Description = "Bot information and status"
         };
@@ -38,17 +39,31 @@ namespace StashBot.Handlers.CommandHandlers
             string queueAmount = queueAmountInt.ToString();
             string queueApproxDays = QueueUtlities.CalculateQueueApproxDays(queueAmountInt).ToString("0.00");
             string totalQueueAmount = QueueData.CountQueueItems().ToString();
+            string usersAmount = AuthorData.CountAuthors().ToString();
 
-            string outputText = $@"<b>StashBot</b> | {version}
+            string name = AppSettings.Config_Name;
+            string descriptionPartial = "";
+            string owner = AppSettings.Config_Owner;
+
+            if (name == "StashBot")
+            {
+                descriptionPartial = "A lovely Telegram bot for queuing posts for a channel.";
+            }
+            else
+            {
+                descriptionPartial = "This bot is powered by <b>StashBot</b>; a lovely self-hosted Telegram bot for queuing posts for a channel.";
+            }
+
+            string outputText = $@"<b>{name}</b> | {version}
+—
+<i>{descriptionPartial} Code can be found <a href=""https://github.com/electricduck/stashbot"">on Github</a>, licensed under <a href=""https://ducky.mit-license.org/"">MIT</a>. This particular instance is ran by {owner}.</i>
+
+<i>There is <b>{queueAmount} queued posts</b>, amounting to approximately <b>{queueApproxDays} days</b>; with <b>{totalQueueAmount} total posts</b>, and <b>{usersAmount} users</b>. <b>{Constants.Cats} cats</b> have been generated.</i> 
 —
 <b>⚙️ Bot</b>
 Memory: <code>{processMemoryUsage}mb</code>
 ️Uptime: <code>{uptime}</code>
 Env.: <code>{runtime}</code>
-—
-<b>📊 Stats</b>
-Queued Posts: <code>{queueAmount}</code> <i>(~{queueApproxDays} days)</i>
-Total Posts: <code>{totalQueueAmount}</code>
 —
 <b>🖥️ System</b>
 Host: <code>{systemHostname}</code>
