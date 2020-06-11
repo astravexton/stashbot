@@ -359,3 +359,4 @@ stashbot.db
 appsettings.json
 stashbot_*.db
 *.db-journal
+/build

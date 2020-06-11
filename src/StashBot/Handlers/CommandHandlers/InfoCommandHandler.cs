@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Microsoft.DotNet.PlatformAbstractions;
 using StashBot.Data;
 using StashBot.Models;
@@ -26,7 +27,8 @@ namespace StashBot.Handlers.CommandHandlers
             string processMemoryUsage = Convert.ToDecimal(thisProcess.WorkingSet64 / 1000000).ToString();
             DateTime processStartTime = thisProcess.StartTime;
             string systemHostname = System.Net.Dns.GetHostName();
-            string systemOpSys = RuntimeEnvironment.OperatingSystem;
+            string systemOpSys = RuntimeEnvironment.OperatingSystem
+                .Replace("debian", "Debian").Replace("ubuntu", "Ubuntu");
             string systemOpSysVersion = RuntimeEnvironment.OperatingSystemVersion;
             string systemTime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss zzz");
             string userId = arguments.TelegramUser.Id.ToString();
@@ -60,12 +62,12 @@ namespace StashBot.Handlers.CommandHandlers
 
 <i>There is <b>{queueAmount} queued posts</b>, amounting to approximately <b>{queueApproxDays} days</b>; with <b>{totalQueueAmount} total posts</b>, and <b>{usersAmount} users</b>. <b>{Constants.Cats} cats</b> have been generated.</i> 
 —
-<b>⚙️ Bot</b>
+<b>🤖 Bot</b>
 Memory: <code>{processMemoryUsage}mb</code>
 ️Uptime: <code>{uptime}</code>
 Env.: <code>{runtime}</code>
 —
-<b>🖥️ System</b>
+<b>⚙️ System</b>
 Host: <code>{systemHostname}</code>
 OS: <code>{systemOpSys} {systemOpSysVersion}</code>
 Time: <code>{systemTime}</code>
