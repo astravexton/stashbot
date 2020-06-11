@@ -93,7 +93,7 @@ namespace StashBot.Data
                 return db.Queue
                     .Include(q => q.Author)
                     .Where(q => q.Status == QueueItem.QueueStatus.Posted)
-                    .OrderBy(q => q.PostedAt)
+                    .OrderByDescending(q => q.PostedAt)
                     .FirstOrDefault();
             }
         }

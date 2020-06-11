@@ -112,8 +112,8 @@ namespace StashBot.Handlers.CommandHandlers
 —
 <b>{Localization.GetPhrase(Localization.Phrase.Name, arguments.TelegramUser)}:</b> {authorNameText}
 <b>{Localization.GetPhrase(Localization.Phrase.Username, arguments.TelegramUser)}:</b> {authorUsernameText}
-<b>{Localization.GetPhrase(Localization.Phrase.ProfileUpdated, arguments.TelegramUser)}:</b> {authorLastUpdatedText}
-<b>{Localization.GetPhrase(Localization.Phrase.Posts, arguments.TelegramUser)}:</b> {authorPostCount} ({queuePercentage.ToString("0.00")}%)";
+<b>{Localization.GetPhrase(Localization.Phrase.ProfileUpdated, arguments.TelegramUser)}:</b> <code>{authorLastUpdatedText}</code>
+<b>{Localization.GetPhrase(Localization.Phrase.Posts, arguments.TelegramUser)}:</b> <code>{authorPostCount}</code> (<code>{queuePercentage.ToString("0.00")}%</code>)";
 
                 TelegramApiService.SendTextMessage(
                     new SendTextMessageArguments

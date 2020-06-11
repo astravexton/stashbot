@@ -1,6 +1,5 @@
 using System;
-using System.Reflection;
-using System.Runtime.Versioning;
+using Microsoft.DotNet.PlatformAbstractions;
 using StashBot.Data;
 using StashBot.Models;
 using StashBot.Models.ArgumentModels;
@@ -21,12 +20,13 @@ namespace StashBot.Handlers.CommandHandlers
             var thisProcess = System.Diagnostics.Process.GetCurrentProcess();
 
             var version = ReflectionUtilities.GetVersion();
+            var runtime = ReflectionUtilities.GetEnvironment();
 
             string processMemoryUsage = Convert.ToDecimal(thisProcess.WorkingSet64 / 1000000).ToString();
             DateTime processStartTime = thisProcess.StartTime;
             string systemHostname = System.Net.Dns.GetHostName();
-            string systemOpSys = "(Unknown OS)";
-            string systemOpSysVersion = String.Empty;
+            string systemOpSys = RuntimeEnvironment.OperatingSystem;
+            string systemOpSysVersion = RuntimeEnvironment.OperatingSystemVersion;
             string systemTime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss zzz");
             string userId = arguments.TelegramUser.Id.ToString();
             string userLanguageCode = arguments.TelegramUser.Language.ToString();
@@ -39,31 +39,6 @@ namespace StashBot.Handlers.CommandHandlers
             string queueApproxDays = QueueUtlities.CalculateQueueApproxDays(queueAmountInt).ToString("0.00");
             string totalQueueAmount = QueueData.CountQueueItems().ToString();
 
-            string runtime = ParseRuntime(Assembly
-                .GetEntryAssembly()?
-                .GetCustomAttribute<TargetFrameworkAttribute>()?
-                .FrameworkName);
-
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
-            {
-                systemOpSys = "Windows";
-
-                if (System.Environment.OSVersion.Version.Build > 9600)
-                {
-                    systemOpSysVersion = "10.0." + System.Environment.OSVersion.Version.Build;
-                }
-            }
-            else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
-            {
-                systemOpSys = "macOS";
-                systemOpSysVersion = System.Environment.OSVersion.Version.ToString();
-            }
-            else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
-            {
-                systemOpSys = "Linux";
-                systemOpSysVersion = System.Environment.OSVersion.Version.ToString();
-            }
-
             string outputText = $@"<b>StashBot</b> | {version}
 —
 <b>⚙️ Bot</b>
@@ -72,8 +47,8 @@ Memory: <code>{processMemoryUsage}mb</code>
 Env.: <code>{runtime}</code>
 —
 <b>📊 Stats</b>
-Queue: <code>{queueAmount}</code> <i>(~{queueApproxDays} days)</i>
-Total: <code>{totalQueueAmount}</code>
+Queued Posts: <code>{queueAmount}</code> <i>(~{queueApproxDays} days)</i>
+Total Posts: <code>{totalQueueAmount}</code>
 —
 <b>🖥️ System</b>
 Host: <code>{systemHostname}</code>
@@ -92,24 +67,6 @@ Language: <code>{userLanguageCode}</code>";
                 Program.BotClient,
                 arguments.TelegramMessageEvent
             );
-        }
-    
-        private static string ParseRuntime(string framework)
-        {
-            string name = "";
-            double version = Convert.ToDouble(
-                framework
-                    .Replace(".NETCoreApp,Version=v", "")
-            );
-
-            if(version >= 5.0)
-            {
-                name = ".NET";
-            } else {
-                name = ".NET Core";
-            }
-
-            return $"{name} {version.ToString("0.0")}";
         }
     }
 }

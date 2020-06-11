@@ -17,27 +17,27 @@ namespace StashBot
 
         static void Main(string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
             try
             {
                 MessageUtilities.PrintStartupMessage();
 
-                if(!File.Exists("stashbot.db"))
-                {
-                    throw new Exception("Database does not exist. Please run 'dotnet ef database restore' to create");
-                }
+                MessageUtilities.PrintInfoMessage("Migrating database...");
+                DbUtilities.MigrateDatabase();
 
-                MessageUtilities.PrintInfoMessage("Backing up database");
+                MessageUtilities.PrintInfoMessage("Backing up database...");
                 DbUtilities.BackupDatabase();
 
-                MessageUtilities.PrintInfoMessage("Consuming settings file");
+                MessageUtilities.PrintInfoMessage("Consuming settings file...");
                 SetupApp();
 
                 BotClient = new TelegramBotClient(AppSettings.ApiKeys_Telegram);
 
-                MessageUtilities.PrintInfoMessage("Connecting to Telegram");
+                MessageUtilities.PrintInfoMessage("Connecting to Telegram...");
                 if (!BotClient.TestApiAsync().Result)
                 {
-                    throw new Exception("Telegram API key invalid");
+                    throw new Exception("Telegram API key invalid.");
                 }
 
                 HelpData.CompileHelp();
@@ -52,7 +52,7 @@ namespace StashBot
 
             try
             {
-                MessageUtilities.PrintInfoMessage("Listening to messages");
+                MessageUtilities.PrintInfoMessage("Listening to messages...");
                 BotClient.OnMessage += BotEventHandler.Bot_OnMessage;
                 BotClient.OnCallbackQuery += BotEventHandler.Bot_OnCallbackQuery;
                 BotClient.OnInlineQuery += BotEventHandler.Bot_OnInlineQueryRecieved;
@@ -68,7 +68,7 @@ namespace StashBot
             {
                 if (AppSettings.Config_Poll)
                 {
-                    MessageUtilities.PrintInfoMessage("Polling queue");
+                    MessageUtilities.PrintInfoMessage("Polling queue...");
                     QueueService.PollQueue();
                 }
                 else
@@ -85,6 +85,12 @@ namespace StashBot
         }
         public static void SetupApp()
         {
+            if(!File.Exists("appsettings.json"))
+            {
+                CreateDefaultConfig();
+                throw new Exception("Settings file did not exist. Please edit 'appsettings.json' and re-run.");
+            }
+
             IConfiguration configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
@@ -95,6 +101,24 @@ namespace StashBot
             AppSettings.Config_Owner = configuration.GetSection("config")["owner"];
             AppSettings.Config_Poll = Convert.ToBoolean(configuration.GetSection("config")["poll"]);
             AppSettings.Config_PostInterval = Convert.ToInt32(configuration.GetSection("config")["postInterval"]);
+        }
+
+        private static void CreateDefaultConfig()
+        {
+            string defaultConfig = @"{
+    ""apiKeys"": {
+        ""telegram"": ""1234567890:AbC_dEfGhIjKlMnOpQrStUvWxYz""
+    },
+    ""config"": {
+        ""channel"": -1000000000000,
+        ""owner"": ""ownerUsername"",
+        ""poll"": true,
+        ""postInterval"": 30000
+    }
+}";
+
+            File.Create("appsettings.json");
+            File.WriteAllText("appsettings.json", defaultConfig);
         }
     }
 }

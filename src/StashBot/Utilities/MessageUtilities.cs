@@ -1,9 +1,9 @@
 using System;
+using Microsoft.DotNet.PlatformAbstractions;
 using Telegram.Bot.Args;
 using StashBot.Models;
 using StashBot.Models.ArgumentModels;
 using StashBot.Services;
-using StashBot.Utilities;
 
 namespace StashBot.Utilities
 {
@@ -37,56 +37,39 @@ namespace StashBot.Utilities
 
         public static void PrintErrorMessage(Exception e, Guid errorGuid)
         {
+            string errorMessage = errorGuid.ToString();
+
+            if(errorGuid == Guid.Empty)
+            {
+                errorMessage = "Oops!";
+            }
+
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"🚫 {errorGuid}");
+            Console.WriteLine($"{RenderEmoji("🚫")}{errorMessage}");
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.WriteLine($"{e.Message}{Environment.NewLine}{e.StackTrace}");
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        public static void PrintHackMessage(string title)
-        {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine($"🔨 Hack: {title}");
             Console.ForegroundColor = ConsoleColor.White;
         }
 
         public static void PrintInfoMessage(string title, string description = "")
         {
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine($"ℹ️  {title}");
+            Console.WriteLine($"{RenderEmoji("ℹ️")}{title}");
             Console.ForegroundColor = ConsoleColor.Gray;
-            if(!String.IsNullOrEmpty(description)) {
+            if (!String.IsNullOrEmpty(description))
+            {
                 Console.WriteLine($"{description}");
             }
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        public static void PrintStartupMessage()
-        {
-            string figlet = @" ____  _            _     ____        _
-/ ___|| |_ __ _ ___| |__ | __ )  ___ | |_
-\___ \| __/ _` / __| '_ \|  _ \ / _ \| __|
- ___) | || (_| \__ | | | | |_) | (_) | |_
-|____/ \__\__,_|___|_| |_|____/ \___/ \__|
-==========================================";
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(figlet);
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine($"StashBot. Version {ReflectionUtilities.GetVersion()}.");
-            Console.WriteLine($"Written by Ducky. Licensed under MIT.");
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("---");
             Console.ForegroundColor = ConsoleColor.White;
         }
 
         public static void PrintSuccessMessage(string title, string description = "")
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"✅ {title}");
+            Console.WriteLine($"{RenderEmoji("✅")}{title}");
             Console.ForegroundColor = ConsoleColor.Gray;
-            if(!String.IsNullOrEmpty(description)) {
+            if (!String.IsNullOrEmpty(description))
+            {
                 Console.WriteLine($"{description}");
             }
             Console.ForegroundColor = ConsoleColor.White;
@@ -95,9 +78,10 @@ namespace StashBot.Utilities
         public static void PrintWarningMessage(string title, string description = "")
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"⚠️  {title}");
+            Console.WriteLine($"{RenderEmoji("⚠️")}{title}");
             Console.ForegroundColor = ConsoleColor.Gray;
-            if(!String.IsNullOrEmpty(description)) {
+            if (!String.IsNullOrEmpty(description))
+            {
                 Console.WriteLine($"{description}");
             }
             Console.ForegroundColor = ConsoleColor.White;
@@ -164,6 +148,48 @@ namespace StashBot.Utilities
             };
 
             TelegramApiService.SendTextMessage(output, Program.BotClient, null);
+        }
+
+        public static void PrintStartupMessage()
+        {
+            string figlet = @" ____  _            _     ____        _
+/ ___|| |_ __ _ ___| |__ | __ )  ___ | |_
+\___ \| __/ _` / __| '_ \|  _ \ / _ \| __|
+ ___) | || (_| \__ | | | | |_) | (_) | |_
+|____/ \__\__,_|___|_| |_|____/ \___/ \__|
+==========================================";
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(figlet);
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.Write("Version ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write(ReflectionUtilities.GetVersion());
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.Write(" using ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(ReflectionUtilities.GetEnvironment());
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("---");
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        private static string RenderEmoji(string emoji)
+        {
+            switch(RuntimeEnvironment.OperatingSystemPlatform)
+            {
+                case Platform.Windows:
+                    return $"{emoji} ";
+                default:
+                    if (emoji.Length == 1)
+                    {
+                        return $"{emoji} ";
+                    }
+                    else
+                    {
+                        return $"{emoji}  ";
+                    }
+            }
         }
     }
 }

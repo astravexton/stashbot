@@ -131,6 +131,12 @@ namespace StashBot.Services.ScrapeServices
                 HtmlNodeCollection extractedImages = documentNode.SelectNodes("//div[contains(@class, 'main-tweet')]//a[contains(@class, 'still-image')]");
                 HtmlNodeCollection extractedVideos = documentNode.SelectNodes("//div[contains(@class, 'main-tweet')]//div[contains(@class, 'gallery-video')]");
 
+                if(extractedImages == null && extractedVideos == null)
+                {
+                    // HACK: GIF?
+                    extractedVideos = documentNode.SelectNodes("//div[contains(@class, 'main-tweet')]//video//source");
+                }
+
                 if (extractedImages != null)
                 {
                     foreach (var extractedImage in extractedImages)

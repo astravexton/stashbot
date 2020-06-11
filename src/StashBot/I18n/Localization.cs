@@ -56,7 +56,7 @@ namespace StashBot.I18n
             if(foundPhrase) {
                 return phraseOutput;
             } else {
-                throw new Exception("Phrase not found");
+                throw new Exception("Phrase not found.");
             }
         }
 

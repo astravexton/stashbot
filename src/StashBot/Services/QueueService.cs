@@ -15,7 +15,6 @@ namespace StashBot.Services
 {
     public class QueueService
     {
-        // TODO: Rewrite this. Its garbage.
         public static void PollQueue()
         {
             Task.Run(() =>
@@ -23,56 +22,48 @@ namespace StashBot.Services
                 try
                 {
                     double sleepTimeFromConfig = AppSettings.Config_PostInterval;
-                    double sleepTime = sleepTimeFromConfig;
+                    double sleepTime = 0;
                     int queueCount = QueueData.CountQueuedQueueItems();
-                    QueueItem soonestQueuedItem = QueueData.GetSoonestQueuedQueueItem();
-                    QueueItem latestQueuedItemSinceFirstStart = QueueData.GetLatestPostedQueueItem();
-                    //bool continueOnFromPreviousStart = true;
+                    QueueItem soonestQueuedItem = null;
+                    QueueItem latestPostedItem = QueueData.GetLatestPostedQueueItem();
+                    bool continueOnFromPreviousStart = true;
 
                     while (true)
                     {
                         if (queueCount == 0)
                         {
-                            //continueOnFromPreviousStart = false;
-                            Thread.Sleep(60000);
+                            continueOnFromPreviousStart = false;
+                            Thread.Sleep(10000); // 10 seconds
                             queueCount = QueueData.CountQueuedQueueItems();
                         }
                         else
                         {
-                            /*if (continueOnFromPreviousStart)
+                            if (continueOnFromPreviousStart)
                             {
-                                if (latestQueuedItemSinceFirstStart != null)
+                                if (latestPostedItem != null)
                                 {
-                                    var adjustedSleepTime = (DateTime.UtcNow - latestQueuedItemSinceFirstStart.PostedAt).TotalMilliseconds;
-                                    adjustedSleepTime = sleepTime - adjustedSleepTime;
+                                    var adjustedSleepTime = sleepTimeFromConfig - (DateTime.UtcNow - latestPostedItem.PostedAt).TotalMilliseconds;
 
                                     if (adjustedSleepTime >= 0)
                                     {
                                         sleepTime = adjustedSleepTime;
-                                    } else {
+                                    }
+                                    else
+                                    {
                                         sleepTime = 0;
                                     }
-
-                                    Thread.Sleep((int)sleepTime);
-
-                                    PostQueueItem(soonestQueuedItem);
-
-                                    queueCount = QueueData.CountQueuedQueueItems();
-                                    soonestQueuedItem = QueueData.GetSoonestQueuedQueueItem();
+                                }
+                                else
+                                {
+                                    sleepTime = sleepTimeFromConfig;
                                 }
 
                                 continueOnFromPreviousStart = false;
                             }
-                            else
-                            {
-                                sleepTime = sleepTimeFromConfig;
-                            }*/
 
                             Thread.Sleep((int)sleepTime);
-                            bool wasPosted = PostQueueItem(soonestQueuedItem);
-
-                            queueCount = QueueData.CountQueuedQueueItems();
                             soonestQueuedItem = QueueData.GetSoonestQueuedQueueItem();
+                            bool wasPosted = PostQueueItem(soonestQueuedItem);
 
                             if (wasPosted)
                             {
@@ -82,6 +73,8 @@ namespace StashBot.Services
                             {
                                 sleepTime = 0;
                             }
+
+                            queueCount = QueueData.CountQueuedQueueItems();
                         }
                     }
                 }
@@ -317,7 +310,7 @@ namespace StashBot.Services
 
         private static string GenerateStatusDateStringForAdvancedCaption(DateTime date, string statusText)
         {
-            return $"{Environment.NewLine}{GeneratorUtilities.GenerateClockEmoji(date)} <b>{statusText}:</b> {date.ToString("dd-MMM-yy hh:mm:ss zz")}";
+            return $"{Environment.NewLine}{GeneratorUtilities.GenerateClockEmoji(date)} <b>{statusText}:</b> <code>{date.ToString("dd-MMM-yy hh:mm:ss zz")}</code>";
         }
     }
 }
